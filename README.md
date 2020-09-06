@@ -1,3 +1,13 @@
+Repo consacré à la découverte du ML par le biais d'une formation Udemy intitulé "Le Deep Learning de A à Z" et conçu par Hadelin de Ponteves, Kirill Eremenko, Charles Bordet.
+
+L'ensemble des fichiers que j'ai modifié possède un suffixe "_hcc" dans leurs noms.
+
+
+
+
+
+
+
 Ce repo contient les projets implémentés pendant le cours [Deep Learning de A à Z](https://www.udemy.com/le-deep-learning-de-a-a-z/?couponCode=WEBSITE) à l'aide de `tensorflow`, `keras`, et `PyTorch`.
 
 1. [Installation des modules](#installation-des-modules)
