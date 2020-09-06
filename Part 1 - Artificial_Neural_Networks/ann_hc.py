@@ -16,21 +16,27 @@ y = dataset.iloc[:, -1].values
 # epoch : An epoch is one complete presentation of the data set to be learned to a learning machine. 
 
 #encodage des variables catégories
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder #transforme les variables catégoriques en nombre
 #from sklearn.compose import ColumnTransformer
-labelencoder_X_1 =  LabelEncoder()
-X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
-labelencoder_X_2 =  LabelEncoder()
-X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
-onehotencoder = OneHotEncoder(categorical_features=[1]) #on encode le pays suivant des colones avec des variables à 1 ou 0 selon l'appartenant des individus aux pays
+# Encode categorical data and scale continuous data
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import make_column_transformer
+preprocess = make_column_transformer(
+        (OneHotEncoder(), ['Geography', 'Gender']),
+        (StandardScaler(), ['CreditScore', 'Age', 'Tenure', 'Balance',
+                            'NumOfProducts', 'HasCrCard', 'IsActiveMember', 
+                            'EstimatedSalary']))
+X = preprocess.fit_transform(X)
+X = np.delete(X, [0,3], 1)
+#on encode le pays suivant des colones avec des variables à 1 ou 0 selon l'appartenant des individus aux pays
 #pas besoin pour le genre qui sera 0 ou 1
+
 
 #problème avec la new version categorical_features
 #plus besoin a priori de LabelEncoder 
 #ct = ColumnTransformer([("Country", OneHotEncoder(), [1])],    remainder = 'passthrough')
 #X = ct.fit_transform(X)
-X = onehotencoder.fit_transform(X).toarray()
-X = X[:, 1:]
+#X = onehotencoder.fit_transform(X).toarray()
+#X = X[:, 1:]
 
 
 
@@ -42,15 +48,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 
 # Feature Scaling
-from sklearn.preprocessing import StandardScaler
+"""from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
-
-
-
-
-
+X_test = sc.transform(X_test)"""  #deja fait plus au dans le preprocess
 
 
 
@@ -63,14 +64,11 @@ import keras
 import tensorflow
 from keras.models import Sequential
 from keras.layers import Dense
-from tensorflow.keras.models import Sequential #module permet d'initialiser le réseau de neurones
-#from keras.models import Sequential
-from tensorflow.keras.layers import Dense#module de creation des couches de reseaux de neurones
+
+
 #Initialisation
-
-
 #Attention ! les instances d'objets et fonctions de tensorflow.keras et keras ne sont pas compatibles entre elles 
-
+#plus maintenenant car tf est devenu le backend par defaut de keras ?
 from keras.layers import Dropout
 classifier = Sequential()
 
@@ -110,6 +108,33 @@ classifier.compile(optimizer="adam",
 #entrainer le reseau de neurones
 classifier.fit(X_train, y_train, batch_size=10, epochs=100)
 
+
+#courbes accuracy / loss
+"""
+# summarize history for accuracy
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+"""
+
+
+
+
+
+
+#PARTIE 3
 # Predicting the Test set results
 y_pred = classifier.predict(X_test)
 y_pred = (y_pred > 0.5)
@@ -133,8 +158,25 @@ newprediction = (newprediction > 0.5)
 y_pred = classifier.predict(X)
 y_pred = (y_pred > 0.5)
 
-#prédit qu'il ne restera pas
-
+#pour un individu
+"""
+#pour un indivu
+Xnew = pd.DataFrame(data={
+        'CreditScore': [600], 
+        'Geography': ['France'], 
+        'Gender': ['Male'],
+        'Age': [40],
+        'Tenure': [3],
+        'Balance': [60000],
+        'NumOfProducts': [2],
+        'HasCrCard': [1],
+        'IsActiveMember': [1],
+        'EstimatedSalary': [50000]})
+Xnew = preprocess.transform(Xnew)
+Xnew = np.delete(Xnew, [0,3], 1)
+new_prediction = classifier.predict(Xnew)
+new_prediction = (new_prediction > 0.5)
+"""
 
 
 
